@@ -16,10 +16,6 @@
     <div class="container">
         <h2>Create VMess Account</h2>
         <input type="text" id="username" placeholder="Username">
-        <input type="text" id="id" placeholder="UUID">
-        <input type="text" id="address" placeholder="Server Address">
-        <input type="number" id="port" placeholder="Port">
-        <input type="text" id="path" placeholder="Path">
         <button onclick="generateVMess()">Generate</button>
         <div class="output" id="output"></div>
     </div>
@@ -42,10 +38,10 @@
 
         function generateVMess() {
             const username = document.getElementById('username').value || 'user';
-            const id = document.getElementById('id').value || generateUUID();
-            const address = document.getElementById('address').value || 'example.com';
-            const port = document.getElementById('port').value || '443';
-            const path = document.getElementById('path').value || '/path';
+            const id = generateUUID();
+            const address = 'your-cloudflare-domain.com';
+            const port = '443';
+            const path = '/v2ray';
 
             const vmessConfig = {
                 v: "2",
