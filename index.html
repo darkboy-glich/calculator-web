@@ -3,63 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
+    <title>V2Ray VMess Account Generator</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f5f5f5; }
-        .calculator { width: 300px; padding: 20px; background-color: white; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .display { width: 100%; height: 50px; text-align: right; margin-bottom: 10px; padding: 10px; font-size: 2em; }
-        .button { width: 70px; height: 70px; margin: 5px; font-size: 1.5em; }
-        .row { display: flex; }
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
+        .container { width: 300px; padding: 20px; background-color: white; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        .output { margin-top: 20px; padding: 10px; background-color: #e9ecef; border-radius: 5px; }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <input type="text" class="display" id="display" disabled>
-        <div class="row">
-            <button class="button" onclick="clearDisplay()">C</button>
-            <button class="button" onclick="appendToDisplay('7')">7</button>
-            <button class="button" onclick="appendToDisplay('8')">8</button>
-            <button class="button" onclick="appendToDisplay('9')">9</button>
-        </div>
-        <div class="row">
-            <button class="button" onclick="appendToDisplay('4')">4</button>
-            <button class="button" onclick="appendToDisplay('5')">5</button>
-            <button class="button" onclick="appendToDisplay('6')">6</button>
-            <button class="button" onclick="appendToDisplay('/')">/</button>
-        </div>
-        <div class="row">
-            <button class="button" onclick="appendToDisplay('1')">1</button>
-            <button class="button" onclick="appendToDisplay('2')">2</button>
-            <button class="button" onclick="appendToDisplay('3')">3</button>
-            <button class="button" onclick="appendToDisplay('*')">*</button>
-        </div>
-        <div class="row">
-            <button class="button" onclick="appendToDisplay('0')">0</button>
-            <button class="button" onclick="appendToDisplay('.')">.</button>
-            <button class="button" onclick="calculate()">=</button>
-            <button class="button" onclick="appendToDisplay('-')">-</button>
-        </div>
-        <div class="row">
-            <button class="button" onclick="appendToDisplay('+')">+</button>
-        </div>
+    <div class="container">
+        <h2>Create VMess Account</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="text" id="id" placeholder="UUID">
+        <input type="text" id="address" placeholder="Server Address">
+        <input type="number" id="port" placeholder="Port">
+        <input type="text" id="path" placeholder="Path">
+        <button onclick="generateVMess()">Generate</button>
+        <div class="output" id="output"></div>
     </div>
-
     <script>
-        function clearDisplay() {
-            document.getElementById('display').value = '';
+        function generateUUID() {
+            let d = new Date().getTime();
+            let d2 = (performance && performance.now && (performance.now()*1000)) || 0;
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = Math.random() * 16;
+                if(d > 0){
+                    r = (d + r)%16 | 0;
+                    d = Math.floor(d/16);
+                } else {
+                    r = (d2 + r)%16 | 0;
+                    d2 = Math.floor(d2/16);
+                }
+                return (c==='x' ? r : (r&0x3|0x8)).toString(16);
+            });
         }
 
-        function appendToDisplay(value) {
-            document.getElementById('display').value += value;
-        }
+        function generateVMess() {
+            const username = document.getElementById('username').value || 'user';
+            const id = document.getElementById('id').value || generateUUID();
+            const address = document.getElementById('address').value || 'example.com';
+            const port = document.getElementById('port').value || '443';
+            const path = document.getElementById('path').value || '/path';
 
-        function calculate() {
-            const display = document.getElementById('display');
-            try {
-                display.value = eval(display.value);
-            } catch {
-                display.value = 'Error';
-            }
+            const vmessConfig = {
+                v: "2",
+                ps: username,
+                add: address,
+                port: port,
+                id: id,
+                aid: "0",
+                net: "ws",
+                type: "none",
+                host: "",
+                path: path,
+                tls: "tls"
+            };
+
+            const base64Config = btoa(JSON.stringify(vmessConfig));
+            const vmessLink = `vmess://${base64Config}`;
+            document.getElementById('output').textContent = vmessLink;
         }
     </script>
 </body>
